@@ -1,54 +1,13 @@
-# Angular Material-Start
+# Adam Conner Code Sample
 
-This Material **start** project is a *seed* for AngularJS Material applications. The project contains a sample AngularJS application and is pre-configured to install the Angular framework and a bunch of development and testing tools for instant web development gratification.
+This project is a *sample* of work from Adam Conner. This was developed against the Hero Api located here
+[Hero API](hero-merge.herokuapp.com)
 
-This sample application is intended to be useful as both a learning tool and a skeleton application
-for a typical [AngularJS Material](http://material.angularjs.org/) web app: comprised of a Side navigation
-area and a content area. You can use it to quickly bootstrap your AngularJS webapp projects and dev
-environment for these projects.
+This code was developed using the [Angular Material Startup Project](https://github.com/angular/material-start) as a starting point.
 
-### What is the UX?
+Roughly 6.5 hours of development time were used to develop this application.
 
-Below is a snapshot of the Starter-App with the Users' *master-detail* view. Also shown is the user
-experience that will be displayed for smaller device sizes. The responsive layout changes to hide
-the user list, reveal the **menu** button. In the User Details view, you may also click the
-**share** button  to show the Contact &lt;User&gt; bottom sheet view.
-
-<br/>
-
-![material-starter-ux2](https://cloud.githubusercontent.com/assets/210413/6448551/70864488-c0e0-11e4-8767-c4e1e4c2f343.png)
-
-<br/>
-
-This Starter app demonstrates how:
-
-*  Angular Material `layout` and `flex` options can easily configure HTML containers
-*  Angular Material components `<md-toolbar>`, `<md-sidenav>`, `<md-icon>` can be quickly used
-*  Custom controllers can use and show `<md-bottomsheet>` with HTML templates
-*  Custom controller can easily, programmatically open & close the SideNav component.
-*  Responsive breakpoints and `$mdMedia` are used
-*  Theming can be altered/configured using `$mdThemingProvider`
-*  ARIA features are supported by Angular Material and warnings can be used to improve accessibility.
-
-### ES5 & ES6 Tutorials
-
-The repository contains both ES5 and ES6 versions of the application. Traditional development with
-ES5 standards and solutions are presented here by default. Tutorials are included: step-by-step
-instructions that clearly demonstrate how the Starter application can be created in minutes.
-
-![Wireframe](https://cloud.githubusercontent.com/assets/210413/6444676/c247c8f8-c0c4-11e4-8206-208f55cbceee.png)
-
-> These tutorials have been presented live, on-stage at **ng-conf 2015, Utah**.
-
-Developers should checkout the following repository branches for:
-
-* Branch [**master**](https://github.com/angular/material-start): contains the finished, ES5, material-starter application.
-* Branch [**Starter - ES5 Tutorials**](https://github.com/angular/material-start/tree/es5-tutorial):
-contains the ES5 tutorials with development Lession #1 - #7.
-* Branch [**Starter - ES6** ](https://github.com/angular/material-start/tree/es6): same completed application as shown in the **[master](https://github.com/angular/material-start)** branch, but implemented with ES6 and JSPM (instead of the ES5 in master).
-
-> The **README** for the ES6 branch will provide some details showing how easy, <u>more simplifed</u>,
-and <u>more manageable</u> it is to develop ES6 applications with Angular Material 1.x. As time permits, we will expand on that information.<br/><br/> 
+A running copy of this code is hosted in Amazon AWS here: [Live Demo](http://hero-app-adcon.s3.amazonaws.com/app/index.html)
 
 ## Getting Started
 
@@ -63,24 +22,14 @@ its package manager (npm) installed.  You can get them from [http://nodejs.org/]
 #### Clone material-start
 
 To get you started you can simply clone `master` branch from the
-[Material-Start](https://github.com/angular/material-start) repository and install the dependencies:
-
-> NOTE: The `master` branch contains the traditional, ES5 implementation familiar to Angular developers.
+[hero-app](https://github.com/adcon267/hero-app) repository and install the dependencies:
 
 Clone the material-start repository using [git][git]:
 
 ```
-git clone https://github.com/angular/material-start.git
+git clone https://github.com/adcon267/hero-app.git
 cd material-start
 ```
-
-If you just want to start a new project without the material-start commit history then you can do:
-
-```bash
-git clone --depth=1 https://github.com/angular/material-start.git <your-project-name>
-```
-
-The `depth=1` tells git to only pull down one commit worth of historical data.
 
 #### Install Dependencies
 
