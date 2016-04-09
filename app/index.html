@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Heroes - Adam C</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+
+    <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:400,500,700,400italic'>
+    <link rel="stylesheet" href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css'>
+    <link rel="stylesheet" href="../node_modules/angular-material/angular-material.css" />
+    <link rel="stylesheet" href="assets/app.css" />
+
+    <style type="text/css">
+        /**
+         * Hide when Angular is not yet loaded and initialized
+         */
+        
+        [ng\:cloak],
+        [ng-cloak],
+        [data-ng-cloak],
+        [x-ng-cloak],
+        .ng-cloak,
+        .x-ng-cloak {
+            display: none !important;
+        }
+    </style>
+
+</head>
+
+<body ng-app="starterApp" layout="row" ng-controller="HeroController as hc" ng-cloak>
+
+    <md-sidenav class="site-sidenav md-sidenav-left md-whiteframe-z2" md-component-id="left" ng-click="hc.toggleList()" aria-label="Show Hero List" md-is-locked-open="$mdMedia('gt-sm')">
+
+        <md-toolbar md-scroll-shrink="" class="md-whiteframe-z1">
+            <h3>Heroes</h3>
+        </md-toolbar>
+
+        <md-list>
+            <md-list-item ng-repeat="it in hc.heroes">
+                <md-button ng-click="hc.selectHero(it)" ng-class="{'selected' : it === hc.selected }">
+                    {{it.hero_name}}
+                </md-button>
+            </md-list-item>
+        </md-list>
+
+        <md-fab-speed-dial md-open="hc.addIsOpen" md-direction="up" class="md-fling add-hero-button">
+            <md-fab-trigger>
+                <md-button aria-label="menu" class="md-fab md-warn">
+                    <i class="fa fa-plus fa-lg"></i>
+                </md-button>
+            </md-fab-trigger>
+
+            <md-fab-actions>
+                <md-button aria-label="New" title="Create new hero" ng-click="hc.addHero()" class="md-fab md-raised md-mini">
+                    <i class="fa fa-plus-circle"></i>
+                </md-button>
+                <md-button aria-label="Combine" title="Combine 2 heroes" ng-click="hc.combineScreen()" class="md-fab md-raised md-mini">
+                    <i class="fa fa-star-half-o"></i>
+                </md-button>
+            </md-fab-actions>
+        </md-fab-speed-dial>
+    </md-sidenav>
+
+
+
+    <div ng-show="!hc.combineScreenOpen" flex layout="column" tabIndex="-1" role="main" class="md-whiteframe-z2">
+
+        <md-toolbar layout="row" class="md-whiteframe-z1">
+            <md-button id="main" class="menu" hide-gt-sm ng-click="hc.toggleList()" aria-label="Show Hero List">
+                <md-icon md-svg-icon="menu"></md-icon>
+            </md-button>
+            <h3>Hero Detail - {{hc.selected.hero_name}}</h3>
+        </md-toolbar>
+
+        <md-content layout-padding="">
+            <div>
+                <form name="heroForm" novalidate>
+                    <div layout-gt-xs="row">
+                        <h2>{{hc.selected.hero_name}}</h2>
+                        <span flex></span>
+                        <md-progress-circular ng-show="hc.updating" md-mode="indeterminate"></md-progress-circular>
+                        <md-button class="md-raised md-primary" ng-hide="hc.selected.id" ng-disabled="heroForm.$invalid  || hc.selected.attributes.intelligence == 1 || hc.selected.attributes.strength == 1 || hc.selected.attributes.speed == 1 || hc.selected.attributes.durability == 1 || hc.selected.attributes.power == 1 || hc.selected.attributes.combat == 1" ng-click="hc.heroSave()">
+                            <i class="fa fa-floppy-o"></i> Save
+                        </md-button>
+                        <md-button class="md-raised md-warn" ng-show="hc.selected.id" ng-click="hc.heroDelete()"><i class="fa fa-trash"></i> Delete</md-button>
+                    </div>
+                    <div layout-gt-xs="row">
+                        <md-input-container class="md-block" flex-gt-sm="">
+                            <label>Hero Name</label>
+                            <input ng-model="hc.selected.hero_name" name="hero_name" required="" ng-change="hc.heroChange()" ng-model-options='{ debounce: 300 }'>
+                            <div ng-messages="heroForm.hero_name.$error">
+                                <div ng-message="required">Hero Name is required.</div>
+                            </div>
+                        </md-input-container>
+                        <md-input-container class="md-block" flex-gt-sm="" ng-show="hc.displayRealName">
+                            <label>Real name</label>
+                            <input ng-model="hc.selected.real_name" name="real_name" required="" ng-change="hc.heroChange()" ng-model-options='{ debounce: 300 }'>
+                            <div ng-messages="heroForm.real_name.$invalid">
+                                <div ng-message="required">Real Name is required.</div>
+                            </div>
+                        </md-input-container>
+                        <md-button ng-click="hc.displayRealName = !hc.displayRealName" class="md-warn"><i class="fa fa-user-secret fa-lg"></i> Toggle Real Name</md-button>
+                    </div>
+                    <div layout-gt-xs="row">
+                        <md-input-container class="md-block" flex-gt-sm="">
+                            <label>Gender</label>
+                            <input ng-model="hc.selected.gender" name="gender" required="" ng-change="hc.heroChange()" ng-model-options='{ debounce: 300 }'>
+                            <div ng-messages="heroForm.gender.$error">
+                                <div ng-message="required">gender is required.</div>
+                            </div>
+                        </md-input-container>
+                    </div>
+                    <h2>Attributes</h2>
+                    <span ng-show="hc.selected.attributes.intelligence == 1 || hc.selected.attributes.strength == 1 || hc.selected.attributes.speed == 1 || hc.selected.attributes.durability == 1 || hc.selected.attributes.power == 1 || hc.selected.attributes.combat == 1" style="color: red;font-size: 10px;">All Attributes must have a value other than 1</span>
+                    <div layout-gt-xs="row" class="attr-row">
+                        <md-slider-container flex-gt-sm="auto" class="attr-slider">
+                            <span>Intelligence</span>
+                            <md-slider min="0" max="100" ng-model="hc.selected.attributes.intelligence" aria-label="intel" id="intel-slider" ng-change="hc.heroChange()" ng-model-options='{ debounce: 300 }'>
+                            </md-slider>
+                        </md-slider-container>
+                        <md-input-container>
+                            <input flex="" min="0" max="100" type="number" ng-model="hc.selected.attributes.intelligence" aria-label="intel" aria-controls="intel-slider" ng-change="hc.heroChange()" ng-model-options='{ debounce: 300 }'>
+                        </md-input-container>
+                    </div>
+                    <div layout-gt-xs="row" class="attr-row">
+                        <md-slider-container flex-gt-sm="auto" class="attr-slider">
+                            <span>Strength</span>
+                            <md-slider min="0" max="100" ng-model="hc.selected.attributes.strength" aria-label="intel" id="intel-slider" ng-change="hc.heroChange()" ng-model-options='{ debounce: 300 }'>
+                            </md-slider>
+                        </md-slider-container>
+                        <md-input-container>
+                            <input flex="" min="0" max="100" type="number" ng-model="hc.selected.attributes.strength" aria-label="intel" aria-controls="intel-slider" ng-change="hc.heroChange()" ng-model-options='{ debounce: 300 }'>
+                        </md-input-container>
+                    </div>
+                    <div layout-gt-xs="row" class="attr-row">
+                        <md-slider-container flex-gt-sm="auto" class="attr-slider">
+                            <span>Speed</span>
+                            <md-slider min="0" max="100" ng-model="hc.selected.attributes.speed" aria-label="intel" id="intel-slider" ng-change="hc.heroChange()" ng-model-options='{ debounce: 300 }'>
+                            </md-slider>
+                        </md-slider-container>
+                        <md-input-container>
+                            <input flex="" min="0" max="100" type="number" ng-model="hc.selected.attributes.speed" aria-label="intel" aria-controls="intel-slider" ng-change="hc.heroChange()" ng-model-options='{ debounce: 300 }'>
+                        </md-input-container>
+                    </div>
+                    <div layout-gt-xs="row" class="attr-row">
+                        <md-slider-container flex-gt-sm="auto" class="attr-slider">
+                            <span>Durability</span>
+                            <md-slider min="0" max="100" ng-model="hc.selected.attributes.durability" aria-label="intel" id="intel-slider" ng-change="hc.heroChange()" ng-model-options='{ debounce: 300 }'>
+                            </md-slider>
+                        </md-slider-container>
+                        <md-input-container>
+                            <input flex="" min="0" max="100" type="number" ng-model="hc.selected.attributes.durability" aria-label="intel" aria-controls="intel-slider" ng-change="hc.heroChange()" ng-model-options='{ debounce: 300 }'>
+                        </md-input-container>
+                    </div>
+                    <div layout-gt-xs="row" class="attr-row">
+                        <md-slider-container flex-gt-sm="auto" class="attr-slider">
+                            <span>Power</span>
+                            <md-slider min="0" max="100" ng-model="hc.selected.attributes.power" aria-label="intel" id="intel-slider" ng-change="hc.heroChange()" ng-model-options='{ debounce: 300 }'>
+                            </md-slider>
+                        </md-slider-container>
+                        <md-input-container>
+                            <input flex="" min="0" max="100" type="number" ng-model="hc.selected.attributes.power" aria-label="intel" aria-controls="intel-slider" ng-change="hc.heroChange()" ng-model-options='{ debounce: 300 }'>
+                        </md-input-container>
+                    </div>
+                    <div layout-gt-xs="row" class="attr-row">
+                        <md-slider-container flex-gt-sm="auto" class="attr-slider">
+                            <span>Combat</span>
+                            <md-slider min="0" max="100" ng-model="hc.selected.attributes.combat" aria-label="intel" id="intel-slider" ng-change="hc.heroChange()" ng-model-options='{ debounce: 300 }'>
+                            </md-slider>
+                        </md-slider-container>
+                        <md-input-container>
+                            <input flex="" min="0" max="100" type="number" ng-model="hc.selected.attributes.combat" aria-label="intel" aria-controls="intel-slider" ng-change="hc.heroChange()" ng-model-options='{ debounce: 300 }'>
+                        </md-input-container>
+                    </div>
+                    <h2>Powers</h2>
+                    <div layout-gt-xs="row" class="attr-row">
+                        <md-chips ng-model="hc.selected.powers" readonly="false" md-on-add="hc.heroChange()" md-on-remove="hc.heroChange()"></md-chips>
+                    </div>
+                    <h2>Weaknesses</h2>
+                    <div layout-gt-xs="row" class="attr-row">
+                        <md-chips ng-model="hc.selected.weaknesses" readonly="false" md-on-add="hc.heroChange()" md-on-remove="hc.heroChange()"></md-chips>
+                    </div>
+                </form>
+            </div>
+        </md-content>
+    </div>
+    <div ng-show="hc.combineScreenOpen" flex layout="column" tabIndex="-1" role="main" class="md-whiteframe-z2">
+        <md-toolbar layout="row" class="md-whiteframe-z1">
+            <md-button id="main2" class="menu" hide-gt-sm ng-click="hc.toggleList()" aria-label="Show Hero List">
+                <md-icon md-svg-icon="menu"></md-icon>
+            </md-button>
+            <h3>Merge Heroes</h3>
+        </md-toolbar>
+
+        <md-content layout-padding="">
+            <div>
+                <h2>Pick 2 Heroes</h2>
+                <div layout-gt-xs="row">
+                    <md-chips ng-model="hc.combineHeroes" md-on-add="hc.combinePowers()" md-autocomplete-snap="" readonly="hc.combineHeroes.length == 2" md-require-match="true" md-max-chips="2">
+                        <md-autocomplete md-selected-item="hc.selectedItem" md-search-text="hc.searchText" md-items="item in hc.querySearch(hc.searchText)" md-item-text="item.hero_name" placeholder="Search for a Hero">
+                            <span md-highlight-text="hc.searchText">{{item.hero_name}}</span>
+                        </md-autocomplete>
+                        <md-chip-template>
+                            <span>
+                      <strong>{{$chip.hero_name}}</strong>
+                    </span>
+                        </md-chip-template>
+                    </md-chips>
+                    <md-button class="md-raised md-warn" ng-show="hc.combineHeroes.length == 2" ng-click="hc.combineHeroes.splice(0,hc.combineHeroes.length)"><i class="fa fa-trash"></i> Clear Selected Heroes</md-button>
+                </div>
+                <form name="heroCombineForm" novalidate>
+                    <div ng-show="hc.combineHeroes.length == 2">
+                        <div layout-gt-xs="row">
+                            <h2>{{hc.selected.hero_name}}</h2>
+                            <span flex></span>
+                            <md-progress-circular ng-show="hc.updating" md-mode="indeterminate"></md-progress-circular>
+                            <md-button class="md-raised md-primary" ng-disabled="heroCombineForm.$invalid || hc.selected.attributes.intelligence == 1 || hc.selected.attributes.strength == 1 || hc.selected.attributes.speed == 1 || hc.selected.attributes.durability == 1 || hc.selected.attributes.power == 1 || hc.selected.attributes.combat == 1 || hc.selected.powers.length > 5" ng-click="hc.heroCombineSave()">
+                                <i class="fa fa-floppy-o"></i> Save
+                            </md-button>
+                        </div>
+                        <div layout-gt-xs="row">
+                            <md-input-container class="md-block" flex-gt-sm="">
+                                <label>Hero Name</label>
+                                <input ng-model="hc.selected.hero_name" name="hero_name" required="" ng-change="hc.heroChange()" ng-model-options='{ debounce: 300 }'>
+                                <div ng-messages="heroCombineForm.hero_name.$error">
+                                    <div ng-message="required">Hero Name is required.</div>
+                                </div>
+                            </md-input-container>
+                            <md-input-container class="md-block" flex-gt-sm="" ng-show="hc.displayRealName">
+                                <label>Real name</label>
+                                <input ng-model="hc.selected.real_name" name="real_name" required="" ng-change="hc.heroChange()" ng-model-options='{ debounce: 300 }'>
+                                <div ng-messages="heroCombineForm.real_name.$error">
+                                    <div ng-message="required">Real Name is required.</div>
+                                </div>
+                            </md-input-container>
+                            <md-button ng-click="hc.displayRealName = !hc.displayRealName" class="md-warn"><i class="fa fa-user-secret fa-lg"></i> Toggle Real Name</md-button>
+                        </div>
+                        <div layout-gt-xs="row">
+                            <md-input-container class="md-block" flex-gt-sm="">
+                                <label>Gender</label>
+                                <input ng-model="hc.selected.gender" name="gender" required="" ng-change="hc.heroChange()" ng-model-options='{ debounce: 300 }'>
+                                <div ng-messages="heroCombineForm.gender.$error">
+                                    <div ng-message="required">gender is required.</div>
+                                </div>
+                            </md-input-container>
+                        </div>
+                        <h2>Attributes</h2>
+                        <div layout-gt-xs="row">
+                            <label>Intelligence</label>
+                            <span flex></span>
+                            <md-input-container class="md-block" flex-gt-sm="">
+                                <md-radio-group ng-model="hc.selected.attributes.intelligence" name="combineIntelligence" layout="row">
+                                    <md-radio-button ng-repeat="h in hc.combineHeroes" ng-value="h.attributes.intelligence" aria-label="{{ h.hero_name }}">
+                                        {{ h.hero_name + ": " + h.attributes.intelligence }}
+                                    </md-radio-button>
+                                </md-radio-group>
+                            </md-input-container>
+                            <span flex></span>
+                        </div>
+                        <div layout-gt-xs="row">
+                            <label>Strength</label>
+                            <span flex></span>
+                            <md-input-container class="md-block" flex-gt-sm="">
+                                <md-radio-group ng-model="hc.selected.attributes.strength" name="combineStrength" layout="row">
+                                    <md-radio-button ng-repeat="h in hc.combineHeroes" ng-value="h.attributes.strength" aria-label="{{ h.hero_name }}">
+                                        {{ h.hero_name + ": " + h.attributes.strength }}
+                                    </md-radio-button>
+                                </md-radio-group>
+                            </md-input-container>
+                            <span flex></span>
+                        </div>
+                        <div layout-gt-xs="row">
+                            <label>Speed</label>
+                            <span flex></span>
+                            <md-input-container class="md-block" flex-gt-sm="">
+                                <md-radio-group ng-model="hc.selected.attributes.speed" name="combineSpeed" layout="row">
+                                    <md-radio-button ng-repeat="h in hc.combineHeroes" ng-value="h.attributes.speed" aria-label="{{ h.hero_name }}">
+                                        {{ h.hero_name + ": " + h.attributes.speed }}
+                                    </md-radio-button>
+                                </md-radio-group>
+                            </md-input-container>
+                            <span flex></span>
+                        </div>
+                        <div layout-gt-xs="row">
+                            <label>Durability</label>
+                            <span flex></span>
+                            <md-input-container class="md-block" flex-gt-sm="">
+                                <md-radio-group ng-model="hc.selected.attributes.durability" name="combineDurability" layout="row">
+                                    <md-radio-button ng-repeat="h in hc.combineHeroes" ng-value="h.attributes.durability" aria-label="{{ h.hero_name }}">
+                                        {{ h.hero_name + ": " + h.attributes.durability }}
+                                    </md-radio-button>
+                                </md-radio-group>
+                            </md-input-container>
+                            <span flex></span>
+                        </div>
+                        <div layout-gt-xs="row">
+                            <label>Power</label>
+                            <span flex></span>
+                            <md-input-container class="md-block" flex-gt-sm="">
+                                <md-radio-group ng-model="hc.selected.attributes.power" name="combinePower" layout="row">
+                                    <md-radio-button ng-repeat="h in hc.combineHeroes" ng-value="h.attributes.power" aria-label="{{ h.hero_name }}">
+                                        {{ h.hero_name + ": " + h.attributes.power }}
+                                    </md-radio-button>
+                                </md-radio-group>
+                            </md-input-container>
+                            <span flex></span>
+                        </div>
+                        <div layout-gt-xs="row">
+                            <label>Combat</label>
+                            <span flex></span>
+                            <md-input-container class="md-block" flex-gt-sm="">
+                                <md-radio-group ng-model="hc.selected.attributes.combat" name="combineCombat" layout="row">
+                                    <md-radio-button ng-repeat="h in hc.combineHeroes" ng-value="h.attributes.combat" aria-label="{{ h.hero_name }}">
+                                        {{ h.hero_name + ": " + h.attributes.combat }}
+                                    </md-radio-button>
+                                </md-radio-group>
+                            </md-input-container>
+                            <span flex></span>
+                        </div>
+                        <h2>Powers</h2>
+                        <span ng-show="hc.selected.powers.length > 5" style="color: red;font-size: 10px;">Merged Hero can only have 5 super powers</span>
+                        <div layout="row" layout-wrap>
+                            <md-checkbox ng-repeat="p in hc.combineHeroPowers" ng-model="p.selected" ng-change="hc.heroPowerChange()">
+                                {{p.name}}
+                            </md-checkbox>
+                        </div>
+                        <h2>Weaknesses</h2>
+                        <div layout-gt-xs="row" class="attr-row">
+                            <md-chips ng-model="hc.selected.weaknesses" readonly="true"></md-chips>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </md-content>
+
+    </div>
+
+
+    <script src="../node_modules/angular/angular.js"></script>
+    <script src="../node_modules/angular-animate/angular-animate.js"></script>
+    <script src="../node_modules/angular-aria/angular-aria.js"></script>
+    <script type="text/javascript" src="../node_modules/angular-material/angular-material.js"></script>
+    <script type="text/javascript" src="../node_modules/angular-messages/angular-messages.js"></script>
+
+    <script src="./src/heroes/Heroes.js"></script>
+    <script src="./src/heroes/HeroController.js"></script>
+    <script src="./src/heroes/HeroService.js"></script>
+
+    <script type="text/javascript">
+        angular
+            .module('starterApp', ['ngMaterial', 'heroes'])
+            .config(function($mdThemingProvider, $mdIconProvider) {
+
+                $mdIconProvider
+                    .defaultIconSet("./assets/svg/avatars.svg", 128)
+                    .icon("menu", "./assets/svg/menu.svg", 24)
+                    .icon("share", "./assets/svg/share.svg", 24)
+                    .icon("google_plus", "./assets/svg/google_plus.svg", 512)
+                    .icon("hangouts", "./assets/svg/hangouts.svg", 512)
+                    .icon("twitter", "./assets/svg/twitter.svg", 512)
+                    .icon("phone", "./assets/svg/phone.svg", 512);
+
+                $mdThemingProvider.theme('default')
+                    .primaryPalette('blue')
+                    .accentPalette('deep-orange');
+
+            });
+    </script>
+
+</body>
+
+</html>
